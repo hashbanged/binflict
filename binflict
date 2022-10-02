@@ -20,7 +20,11 @@
 #  This was coded as a personal utility for a secure programming course and 
 #  probably won't do much for you.
 #
-#  Author: Alan Scott
+#  Author: Alan Scott <hasbanged@protonmail.com>
+#  https://github.com/hashbanged/binflict
+
+#  This project is licensed under the terms of the MIT license.
+#  https://en.wikipedia.org/wiki/MIT_License
 
 binary=""
 
@@ -47,27 +51,27 @@ file. In combination, inputs are appended in the following order:
   3. payload
 
 Requirements
-  -b, --binary          select the file to be executed
+  -b (binary)       select the file to be executed
 
 Options
-  -c, --character       specify the character to be sequenced; use in
-                          combination with the -n switch
-  -l, --nopsled         shortcut option to pipe a NOP sled of N \\\x90 
-                          characters to the binary; cannot be used with -n
-  -n, --number          pipe a sequence of N characters to the binary; the
-                          default character '@' is used, if the -c switch
-                          is not supplied; cannot be used with -l or -s
-  -p, --payload         execute using a payload file; if used with -l or -n, 
-                          the payload is joined to the end of the character
-                          sequence; strings assigned with -s are positioned
-                          before the payload
-  -s, --string          pipe a string to the binary; hex characters 
-                           are wrapped in double quotes; string is always
-                           appended to the end of -l or -n operations, and 
-                           -p contents are always appended last; this is more 
-                           useful for specifying a non-file payload
-  -v, --verbose         show configuration details before execution
-  -h, --help            print this usage
+  -c (character)    specify the character to be sequenced; use in combination 
+                      with the -n switch
+  -l (sled number)  shortcut option to pipe a NOP sled of N \\\x90 characters 
+                      to the binary; cannot be used with -n
+  -n (number)       pipe a sequence of N characters to the binary; the default 
+                      character '@' is used, if the -c switch is not supplied; 
+                      cannot be used with -l or -s
+  -p (payload)      execute using a payload file; if used with -l or -n, the 
+                      payload is joined to the end of the character sequence; 
+                      strings assigned with -s are positioned before the 
+                      payload
+  -s (string)       pipe a string to the binary; hex characters are wrapped in 
+                      double quotes; string is always appended to the end of -l 
+                      or -n operations, and -p contents are always appended 
+                      last; this is more useful for specifying a non-file 
+                      payload
+  -v (verbose)      show configuration details before execution
+  -h (help)         print this usage
 
 Examples:
 
@@ -93,8 +97,8 @@ Examples:
     binflict -b myvulnerableapp -l 128 -s "Look out!" -p payloadfile
 
 Author: Alan Scott <hashbanged@protonmail.com>
+https://github.com/hashbanged/binflict
 This project is licensed under the terms of the MIT license.
-https://en.wikipedia.org/wiki/MIT_License
 EOF
 )
 
@@ -158,28 +162,28 @@ print_help () {
 
 while getopts ':b:c:l:n:p:s:vh' OPTION; do
     case "$OPTION" in
-        b|binary) 
+        b) 
             arg_binary="${OPTARG}"
             ;;
-        c|character) 
+        c) 
             arg_character="${OPTARG}"
             ;;
-        l|nopsled) 
+        l) 
             arg_nopsled="${OPTARG}"
             ;;
-        n|number) 
+        n) 
             arg_number="${OPTARG}"
             ;;
-        p|payload) 
+        p) 
             arg_payload="${OPTARG}"
             ;;
-        s|string) 
+        s) 
             arg_string="${OPTARG}"
             ;;
-        v|verbose) 
+        v) 
             arg_verbose="1"
             ;;
-        h|help) 
+        h) 
             print_help
             exit 0
             ;;

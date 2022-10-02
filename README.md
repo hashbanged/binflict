@@ -23,37 +23,37 @@ Input is supplied using character or NOP repetition, a string, or a payload file
 
 ### Requirements
 
-`-b, --binary`  
+**`-b` (binary)**  
 select the file to be executed
 
 ### Options
 
-`-c, --character`  
+**`-c` (character)**  
 specify the character to be sequenced; use in combination with the -n switch
 
-`-l, --nopsled`  
+**`-l` (sled number)**  
 shortcut option to pipe a NOP sled of N \x90 characters to the binary; cannot be used with -n
 
-`-n, --number`  
+**`-n` (number)**  
 pipe a sequence of N characters to the binary; the default character '@' is used, if the -c switch is not supplied; cannot be used with -l or -s
 
-`-p, --payload`  
+**`-p` (payload)**  
 execute using a payload file; if used with -l or -n, the payload is joined to the end of the character sequence; strings assigned with -s are positioned before the payload
 
-`-s, --string`  
+**`-s` (string)**  
 pipe a string to the binary; hex characters are wrapped in double quotes; string is always appended to the end of -l or -n operations, and -p contents are always appended last; this is more useful for specifying a non-file payload
 
-`-v, --verbose`  
+**`-v` (verbose)**  
 show configuration details before execution
 
-`-h, --help`  
+**`-h` (help)**  
 print this usage
 
 ---
 
 ## Examples:
 
-Do nothing--run executable normally:
+Do nothing&mdash;run executable normally:
 
 ```sh
 binflict -b myvulnerableapp
