@@ -1,0 +1,310 @@
+#!/bin/bash
+#
+#  MMM'         lMM0                 .kNMMMMMMM.  dBEx
+#  MMM'         ;OOd                 NMMx;'dMMM.  cO0l              xMMx
+#  MMM;cxOkl.   ,;;;   ddd.:xOko.  lkMMMxd:.MMM.  ,;;;    ,oxOkxo .dXMMXddd
+#  MMMNo:oWMM:  lMM0   MMMNdckMMW. :xMMMol,.MMM.  dMax  'NMMkc:cx..lKMMKlll
+#  MMM,   cMMW  lMM0   MMM;   WMM,  .MMM   .MMM.  dKEx  KMMd        xMMx
+#  MMMc   oMMX  lMM0   MMM.   WMM,  .MMM   .MMM.  dCOx  0MMO        xMMx
+#  MMMX0kKMMX.  lMM0   MMM.   WMM,  .MMM   .MMM.  ddEx  .kMMNOxOX.  ;MMMK0o
+#  ;;; .:c:'    .;;'   ;;;    ,;;   .MMM    ;;;   .;;.     ':cc:,     ',;;.
+#                                   .MMM.
+#                                MMMMMMMMMMN
+#                                oooxMMMoooc
+#                                   .MMM
+#                                   .MMM
+#                                   .MMM
+#
+#  Execute a binary with character input to probe for segfaults. 
+#
+#  This was coded as a personal utility for a secure programming course and 
+#  probably won't do much for you.
+#
+#  Author: Alan Scott
+
+binary=""
+
+character_default="@"
+
+nop="\x90"
+
+banner="\x0a\x4d\x4d\x4d\x27\x20\x20\x20\x20\x20\x20\x20\x20\x20\x6c\x4d\x4d\x30\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2e\x6b\x4e\x4d\x4d\x4d\x4d\x4d\x4d\x4d\x2e\x20\x20\x64\x42\x45\x78\x0a\x4d\x4d\x4d\x27\x20\x20\x20\x20\x20\x20\x20\x20\x20\x3b\x4f\x4f\x64\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x4e\x4d\x4d\x78\x3b\x27\x64\x4d\x4d\x4d\x2e\x20\x20\x63\x4f\x30\x6c\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x78\x4d\x4d\x78\x0a\x4d\x4d\x4d\x3b\x63\x78\x4f\x6b\x6c\x2e\x20\x20\x20\x2c\x3b\x3b\x3b\x20\x20\x20\x64\x64\x64\x2e\x3a\x78\x4f\x6b\x6f\x2e\x20\x20\x6c\x6b\x4d\x4d\x4d\x78\x64\x3a\x2e\x4d\x4d\x4d\x2e\x20\x20\x2c\x3b\x3b\x3b\x20\x20\x20\x20\x2c\x6f\x78\x4f\x6b\x78\x6f\x20\x2e\x64\x58\x4d\x4d\x58\x64\x64\x64\x0a\x4d\x4d\x4d\x4e\x6f\x3a\x6f\x57\x4d\x4d\x3a\x20\x20\x6c\x4d\x4d\x30\x20\x20\x20\x4d\x4d\x4d\x4e\x64\x63\x6b\x4d\x4d\x57\x2e\x20\x3a\x78\x4d\x4d\x4d\x6f\x6c\x2c\x2e\x4d\x4d\x4d\x2e\x20\x20\x64\x4d\x61\x78\x20\x20\x27\x4e\x4d\x4d\x6b\x63\x3a\x63\x78\x2e\x2e\x6c\x4b\x4d\x4d\x4b\x6c\x6c\x6c\x0a\x4d\x4d\x4d\x2c\x20\x20\x20\x63\x4d\x4d\x57\x20\x20\x6c\x4d\x4d\x30\x20\x20\x20\x4d\x4d\x4d\x3b\x20\x20\x20\x57\x4d\x4d\x2c\x20\x20\x2e\x4d\x4d\x4d\x20\x20\x20\x2e\x4d\x4d\x4d\x2e\x20\x20\x64\x4b\x45\x78\x20\x20\x4b\x4d\x4d\x64\x20\x20\x20\x20\x20\x20\x20\x20\x78\x4d\x4d\x78\x0a\x4d\x4d\x4d\x63\x20\x20\x20\x6f\x4d\x4d\x58\x20\x20\x6c\x4d\x4d\x30\x20\x20\x20\x4d\x4d\x4d\x2e\x20\x20\x20\x57\x4d\x4d\x2c\x20\x20\x2e\x4d\x4d\x4d\x20\x20\x20\x2e\x4d\x4d\x4d\x2e\x20\x20\x64\x43\x4f\x78\x20\x20\x30\x4d\x4d\x4f\x20\x20\x20\x20\x20\x20\x20\x20\x78\x4d\x4d\x78\x0a\x4d\x4d\x4d\x58\x30\x6b\x4b\x4d\x4d\x58\x2e\x20\x20\x6c\x4d\x4d\x30\x20\x20\x20\x4d\x4d\x4d\x2e\x20\x20\x20\x57\x4d\x4d\x2c\x20\x20\x2e\x4d\x4d\x4d\x20\x20\x20\x2e\x4d\x4d\x4d\x2e\x20\x20\x64\x64\x45\x78\x20\x20\x2e\x6b\x4d\x4d\x4e\x4f\x78\x4f\x58\x2e\x20\x20\x3b\x4d\x4d\x4d\x4b\x30\x6f\x0a\x3b\x3b\x3b\x20\x2e\x3a\x63\x3a\x27\x20\x20\x20\x20\x2e\x3b\x3b\x27\x20\x20\x20\x3b\x3b\x3b\x20\x20\x20\x20\x2c\x3b\x3b\x20\x20\x20\x2e\x4d\x4d\x4d\x20\x20\x20\x20\x3b\x3b\x3b\x20\x20\x20\x2e\x3b\x3b\x2e\x20\x20\x20\x20\x20\x27\x3a\x63\x63\x3a\x2c\x20\x20\x20\x20\x20\x27\x2c\x3b\x3b\x2e\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2e\x4d\x4d\x4d\x2e\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x4d\x4d\x4d\x4d\x4d\x4d\x4d\x4d\x4d\x4d\x4e\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x6f\x6f\x6f\x78\x4d\x4d\x4d\x6f\x6f\x6f\x63\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2e\x4d\x4d\x4d\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2e\x4d\x4d\x4d\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x2e\x4d\x4d\x4d"
+
+separator="----------------------------------------------------"
+
+help_message=$(cat << EOF
+${banner}
+
+Execute a binary with character input to probe for segfaults. 
+
+Usage: binflict -b myvulnerableapp [OPTIONS]
+
+Input is supplied using character or NOP repetition, a string, or a payload 
+file. In combination, inputs are appended in the following order:
+
+  1. character sequence or NOP sled
+  2. string
+  3. payload
+
+Requirements
+  -b, --binary          select the file to be executed
+
+Options
+  -c, --character       specify the character to be sequenced; use in
+                          combination with the -n switch
+  -l, --nopsled         shortcut option to pipe a NOP sled of N \\\x90 
+                          characters to the binary; cannot be used with -n
+  -n, --number          pipe a sequence of N characters to the binary; the
+                          default character '@' is used, if the -c switch
+                          is not supplied; cannot be used with -l or -s
+  -p, --payload         execute using a payload file; if used with -l or -n, 
+                          the payload is joined to the end of the character
+                          sequence; strings assigned with -s are positioned
+                          before the payload
+  -s, --string          pipe a string to the binary; hex characters 
+                           are wrapped in double quotes; string is always
+                           appended to the end of -l or -n operations, and 
+                           -p contents are always appended last; this is more 
+                           useful for specifying a non-file payload
+  -v, --verbose         show configuration details before execution
+  -h, --help            print this usage
+
+Examples:
+
+  Do nothing--run executable normally:
+    binflict -b myvulnerableapp
+
+  Probe with character sequence:
+    binflict -b myvulnerableapp -n 42
+    binflict -b myvulnerableapp -n 100 -c H
+    binflict -b myvulnerableapp -n 100 -c \\\\\\\x23
+    binflict -b myvulnerableapp -n 100 -c "\\\x23"
+
+  Probe with string:
+    binflict -b myvulnerableapp -s Hashbanged
+    binflict -b myvulnerableapp -s "\\\x48\\\x61\\\x73\\\x68\\\x62\\\x61\\\x6e\\\x67\\\x65\\\x64"
+
+  Supply a payload file:
+    binflict -b myvulnerableapp -p payloadfile
+
+  Apply a NOP sled, optionally with appended string and/or payload:
+    binflict -b myvulnerableapp -l 256
+    binflict -b myvulnerableapp -l 128 -p payloadfile
+    binflict -b myvulnerableapp -l 128 -s "Look out!" -p payloadfile
+
+Author: Alan Scott <hashbanged@protonmail.com>
+This project is licensed under the terms of the MIT license.
+https://en.wikipedia.org/wiki/MIT_License
+EOF
+)
+
+print_sequence () {
+    sequence=$1
+    echo -e "\n$(cat << EOF
+The following character sequence will be injected:
+$separator
+$sequence
+$separator
+EOF
+)\n"
+}
+
+run () {
+    binary_file="$1"
+    payload_file="$2"
+    character="$3"
+    nopsled_number="$4"
+    number="$5"
+    string="$6"
+    verbose="$7"
+    has_sequence_parts=0
+
+    if [ "$number" ]; then
+        char_seq="$(printf "${character}%.0s" $(seq 1 $number))"
+        has_sequence_parts=1
+    elif [ "$nopsled_number" ]; then
+        char_seq="$(printf "${nop}%.0s" $(seq 1 $nopsled_number))"
+        has_sequence_parts=1
+    else
+        char_seq=""
+    fi
+
+    if [ "$payload_file" ]; then
+        sequence="${char_seq}${string}$(<${payload_file})"
+        has_sequence_parts
+    else
+        sequence="${char_seq}${string}"
+    fi
+
+    echo -e "[+] Configuration complete."
+
+    # Print the sequence in verbose mode.
+    if (( $verbose == 1 )) && (( $has_sequence_parts == 1 )); then
+        print_sequence $sequence
+    fi
+
+    echo -e "[+] Running binary.\n"
+    echo -e "Binary output:"
+    echo -e "${separator}"
+    echo -e "${sequence}" | $binary_file
+    exit_code=$?
+    echo -e "${separator}"
+    echo -e "\n[+] Execution complete with exit code ${exit_code}."
+}
+
+print_help () {
+    echo -e "${help_message}"
+}
+
+while getopts ':b:c:l:n:p:s:vh' OPTION; do
+    case "$OPTION" in
+        b|binary) 
+            arg_binary="${OPTARG}"
+            ;;
+        c|character) 
+            arg_character="${OPTARG}"
+            ;;
+        l|nopsled) 
+            arg_nopsled="${OPTARG}"
+            ;;
+        n|number) 
+            arg_number="${OPTARG}"
+            ;;
+        p|payload) 
+            arg_payload="${OPTARG}"
+            ;;
+        s|string) 
+            arg_string="${OPTARG}"
+            ;;
+        v|verbose) 
+            arg_verbose="1"
+            ;;
+        h|help) 
+            print_help
+            exit 0
+            ;;
+        ?)
+            echo -e "[-] Invalid or missing arguments. Use 'binflict -h' for help."
+            exit 1
+            ;;
+    esac
+done
+
+# Check argument contradictions.
+if [ "$arg_number" ] && [ "$arg_nopsled" ]; then
+    echo -e "[-] Cannot execute using both -n and -l operations."
+    exit 1
+fi
+
+# Validate the binary file argument.
+if [ -z "$arg_binary" ]; then
+    echo -e "[-] Missing required binary for execution. Use '-b' to specify the file."
+    exit 1
+fi
+
+if ! [ -f $arg_binary ]; then
+    echo -e "[-] The file ${arg_binary} does not exist or could not be accessed."
+    exit 1
+fi
+
+# The binary file argument checks out; assign the file.
+binary_file="${arg_binary}"
+
+echo -e "[+] Selecting ${binary_file} for execution."
+
+# Validate the payload file argument.
+if [ "$arg_payload" ]; then
+    if ! [ -f $arg_payload ]; then
+        echo -e "[-] The payload file ${arg_payload} does not exist or could not be accessed."
+        exit 1
+    fi
+
+    # Assign the payload file.
+    payload_file="${arg_payload}"
+
+    echo -e "[+] Selecting ${payload_file} as payload."
+else 
+    payload_file=""
+fi
+
+# Validate the character argument.
+use_char_warn=0
+if ! [ "$arg_number" ] && ! [ "$arg_nopsled" ]; then
+    if [ "$arg_character" ]; then
+        use_char_warn=1
+        echo -e "[-] A character argument was given, but no operations will use it."
+    else
+        use_char_warn=2
+    fi
+fi
+
+if [ "$arg_character" ]; then
+    # Truncate strings, since a single character is expected. Hex characters 
+    # must be supplied in double quotes, and 'echo -e' is used to escape the 
+    # argument for conversion.
+    escaped_characters=$(echo -e "${arg_character}")
+    character="${escaped_characters:0:1}"
+
+    if (( $use_char_warn == 0 )); then
+        echo -e "[+] Setting '${character}' as character."
+    fi
+else 
+    character="${character_default}"
+
+    if (( $use_char_warn == 0 )); then
+        echo -e "[+] Setting default '${character}' as character."
+    fi
+fi
+
+# Validate the nopsled argument.
+if [ "$arg_nopsled" ]; then
+    regex='^[0-9]+$'
+    if ! [[ $arg_nopsled =~ $regex ]] || (( $arg_nopsled < 1 )); then
+        echo -e "[-] The nopsled argument requires a positive, non-zero integer."
+        exit 1
+    fi
+
+    nopsled_number=$((arg_nopsled))
+
+    echo -e "[+] Setting NOP sled sequence count to ${nopsled_number}."
+else 
+    nopsled_number=""
+fi
+
+# Validate the number argument.
+if [ "$arg_number" ]; then
+    regex='^[0-9]+$'
+    if ! [[ $arg_number =~ $regex ]] || (( $arg_number < 1 )); then
+        echo -e "[-] The number argument requires a positive, non-zero integer."
+        exit 1
+    fi
+
+    number=$((arg_number))
+
+    echo -e "[+] Setting sequence count to ${number}."
+else
+    number=""
+fi
+
+# Validate the string argument.
+if [ "$arg_string" ]; then
+    escaped_string=$(echo -e "${arg_string}")
+    string="${escaped_string}"
+
+    echo -e "[+] Setting '${string}' as string."
+else
+    string=""
+fi
+
+# Process the verbose argument.
+if [ "$arg_verbose" ]; then
+    verbose=1
+else
+    verbose=0
+fi
+
+run "$binary_file" "$payload_file" "$character" "$nopsled_number" "$number" "$string" "$verbose"
+
+echo -e "[+] Done!"
+
+exit 0
