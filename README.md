@@ -35,7 +35,7 @@ specify the character to be sequenced; use in combination with the -n switch
 shortcut option to pipe a NOP sled of N \x90 characters to the binary; cannot be used with -n
 
 **`-n` (number)**  
-pipe a sequence of N characters to the binary; the default character '@' is used, if the -c switch is not supplied; cannot be used with -l or -s
+pipe a sequence of N characters to the binary; the default character '@' is used, if the -c switch is not supplied; cannot be used with -l
 
 **`-p` (payload)**  
 execute using a payload file; if used with -l or -n, the payload is joined to the end of the character sequence; strings assigned with -s are positioned before the payload
