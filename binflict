@@ -133,6 +133,10 @@ run () {
         char_seq=""
     fi
 
+    if [ "$string" ]; then
+        has_sequence_parts=1
+    fi
+
     if [ "$payload_file" ]; then
         sequence="${char_seq}${string}$(<${payload_file})"
         has_sequence_parts=1
@@ -305,8 +309,7 @@ fi
 
 # Validate the string argument.
 if [ "$arg_string" ]; then
-    escaped_string=$(echo -e "${arg_string}")
-    string="${escaped_string}"
+    string="${arg_string}"
 
     echo -e "[+] Setting '${string}' as string."
 else
