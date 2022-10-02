@@ -20,7 +20,7 @@
 #  This was coded as a personal utility for a secure programming course and 
 #  probably won't do much for you.
 #
-#  Author: Alan Scott <hasbanged@protonmail.com>
+#  Author: Alan Scott
 #  https://github.com/hashbanged/binflict
 
 #  This project is licensed under the terms of the MIT license.
@@ -96,7 +96,7 @@ Examples:
     binflict -b myvulnerableapp -l 128 -p payloadfile
     binflict -b myvulnerableapp -l 128 -s "Look out!" -p payloadfile
 
-Author: Alan Scott <hashbanged@protonmail.com>
+Author: Alan Scott
 https://github.com/hashbanged/binflict
 This project is licensed under the terms of the MIT license.
 EOF

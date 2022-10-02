@@ -6,7 +6,9 @@ Execute a binary with character input to probe for segfaults.
 
 This was coded as a personal utility for a secure programming course and probably won't do much for you.
 
-Author: Alan Scott <hashbanged@protonmail.com>  
+Author: Alan Scott  
+https://github.com/hashbanged/binflict
+
 This project is licensed under the terms of the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
 
 ---
