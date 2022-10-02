@@ -135,7 +135,7 @@ run () {
 
     if [ "$payload_file" ]; then
         sequence="${char_seq}${string}$(<${payload_file})"
-        has_sequence_parts
+        has_sequence_parts=1
     else
         sequence="${char_seq}${string}"
     fi
@@ -206,6 +206,12 @@ if [ -z "$arg_binary" ]; then
     exit 1
 fi
 
+# Prepend local path to binary, if path isn't specified.
+regex='^([.]{1,2}|~)?\/+(.*)$'
+if ! [[ $arg_binary =~ $regex ]]; then
+    arg_binary="./${arg_binary}"
+fi
+
 if ! [ -f $arg_binary ]; then
     echo -e "[-] The file ${arg_binary} does not exist or could not be accessed."
     exit 1
@@ -218,6 +224,13 @@ echo -e "[+] Selecting ${binary_file} for execution."
 
 # Validate the payload file argument.
 if [ "$arg_payload" ]; then
+
+    # Prepend local path, if path isn't specified.
+    regex='^([.]{1,2}|~)?\/+(.*)$'
+    if ! [[ $arg_payload =~ $regex ]]; then
+        arg_payload="./${arg_payload}"
+    fi
+
     if ! [ -f $arg_payload ]; then
         echo -e "[-] The payload file ${arg_payload} does not exist or could not be accessed."
         exit 1
